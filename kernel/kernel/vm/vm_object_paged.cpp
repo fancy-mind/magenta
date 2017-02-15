@@ -223,6 +223,11 @@ status_t VmObjectPaged::GetPageLocked(uint64_t offset, uint pf_flags, vm_page_t*
 
     LTRACEF("faulted in page %p, pa %#" PRIxPTR "\n", p, pa);
 
+    // other mappings may have covered this offset into the vmo, so unmap those ranges
+    for (auto& r : region_list_) {
+        r.UnmapVmoRangeLocked(offset, PAGE_SIZE);
+    }
+
     if (page_out)
         *page_out = p;
     if (pa_out)
