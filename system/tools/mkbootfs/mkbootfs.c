@@ -592,7 +592,15 @@ int main(int argc, char **argv) {
             argc--;
             argv++;
         } else if (!strcmp(cmd,"-h")) {
-            fprintf(stderr, "usage: mkbootfs [-v] [-o <fsimage>] <manifests>...\n");
+            fprintf(stderr, "usage: mkbootfs "
+                   "[-v] [-o <fsimage>] [<pre-binaries>...] <manifests>... [<post-binaries>...]\n\n"
+                    "Any bootdata binary listed *before* the first manifest or  directory\n"
+                    "will be copied into the output before the bootdata record for this bootfs.\n"
+                    "Any bootdata binaries listed *after* the first manifest or directory will be\n"
+                    "copied into the output file after the bootdata record for this bootfs.\n\n"
+                    "Bootdata files are differentiated from manifests by their header.\n"
+                    "There are no special requirements for filenames of bootdata binaries"
+                    "or manifest files.\n");
             return 0;
         } else if (!strcmp(cmd,"-c")) {
             compressed = true;
