@@ -506,90 +506,95 @@
         static_cast<mx_cache_policy_t>(arg3),
         reinterpret_cast<mx_handle_t*>(arg4)));
         break;
-    case 92: ret = static_cast<uint64_t>(sys_pci_io_write(
+    case 92: ret = static_cast<uint64_t>(sys_pci_get_bar(
+        static_cast<mx_handle_t>(arg1),
+        static_cast<uint32_t>(arg2),
+        reinterpret_cast<mx_handle_t*>(arg3)));
+        break;
+    case 93: ret = static_cast<uint64_t>(sys_pci_io_write(
         static_cast<mx_handle_t>(arg1),
         static_cast<uint32_t>(arg2),
         static_cast<uint32_t>(arg3),
         static_cast<uint32_t>(arg4),
         static_cast<uint32_t>(arg5)));
         break;
-    case 93: ret = static_cast<uint64_t>(sys_pci_io_read(
+    case 94: ret = static_cast<uint64_t>(sys_pci_io_read(
         static_cast<mx_handle_t>(arg1),
         static_cast<uint32_t>(arg2),
         static_cast<uint32_t>(arg3),
         static_cast<uint32_t>(arg4),
         reinterpret_cast<uint32_t*>(arg5)));
         break;
-    case 94: ret = static_cast<uint64_t>(sys_pci_map_interrupt(
+    case 95: ret = static_cast<uint64_t>(sys_pci_map_interrupt(
         static_cast<mx_handle_t>(arg1),
         static_cast<int32_t>(arg2),
         reinterpret_cast<mx_handle_t*>(arg3)));
         break;
-    case 95: ret = static_cast<uint64_t>(sys_pci_map_config(
+    case 96: ret = static_cast<uint64_t>(sys_pci_map_config(
         static_cast<mx_handle_t>(arg1),
         reinterpret_cast<mx_handle_t*>(arg2)));
         break;
-    case 96: ret = static_cast<uint64_t>(sys_pci_query_irq_mode_caps(
+    case 97: ret = static_cast<uint64_t>(sys_pci_query_irq_mode_caps(
         static_cast<mx_handle_t>(arg1),
         static_cast<uint32_t>(arg2),
         reinterpret_cast<uint32_t*>(arg3)));
         break;
-    case 97: ret = static_cast<uint64_t>(sys_pci_set_irq_mode(
+    case 98: ret = static_cast<uint64_t>(sys_pci_set_irq_mode(
         static_cast<mx_handle_t>(arg1),
         static_cast<uint32_t>(arg2),
         static_cast<uint32_t>(arg3)));
         break;
-    case 98: ret = static_cast<uint64_t>(sys_pci_init(
+    case 99: ret = static_cast<uint64_t>(sys_pci_init(
         static_cast<mx_handle_t>(arg1),
         reinterpret_cast<const mx_pci_init_arg_t*>(arg2),
         static_cast<uint32_t>(arg3)));
         break;
-    case 99: ret = static_cast<uint64_t>(sys_pci_add_subtract_io_range(
+    case 100: ret = static_cast<uint64_t>(sys_pci_add_subtract_io_range(
         static_cast<mx_handle_t>(arg1),
         static_cast<bool>(arg2),
         static_cast<uint64_t>(arg3),
         static_cast<uint64_t>(arg4),
         static_cast<bool>(arg5)));
         break;
-    case 100: ret = static_cast<uint64_t>(sys_acpi_uefi_rsdp(
+    case 101: ret = static_cast<uint64_t>(sys_acpi_uefi_rsdp(
         static_cast<mx_handle_t>(arg1)));
         break;
-    case 101: ret = static_cast<uint64_t>(sys_acpi_cache_flush(
+    case 102: ret = static_cast<uint64_t>(sys_acpi_cache_flush(
         static_cast<mx_handle_t>(arg1)));
         break;
-    case 102: ret = static_cast<uint64_t>(sys_resource_create(
+    case 103: ret = static_cast<uint64_t>(sys_resource_create(
         static_cast<mx_handle_t>(arg1),
         reinterpret_cast<const mx_rrec_t*>(arg2),
         static_cast<uint32_t>(arg3),
         reinterpret_cast<mx_handle_t*>(arg4)));
         break;
-    case 103: ret = static_cast<uint64_t>(sys_resource_get_handle(
+    case 104: ret = static_cast<uint64_t>(sys_resource_get_handle(
         static_cast<mx_handle_t>(arg1),
         static_cast<uint32_t>(arg2),
         static_cast<uint32_t>(arg3),
         reinterpret_cast<mx_handle_t*>(arg4)));
         break;
-    case 104: ret = static_cast<uint64_t>(sys_resource_do_action(
+    case 105: ret = static_cast<uint64_t>(sys_resource_do_action(
         static_cast<mx_handle_t>(arg1),
         static_cast<uint32_t>(arg2),
         static_cast<uint32_t>(arg3),
         static_cast<uint32_t>(arg4),
         static_cast<uint32_t>(arg5)));
         break;
-    case 105: ret = static_cast<uint64_t>(sys_resource_connect(
+    case 106: ret = static_cast<uint64_t>(sys_resource_connect(
         static_cast<mx_handle_t>(arg1),
         static_cast<mx_handle_t>(arg2)));
         break;
-    case 106: ret = static_cast<uint64_t>(sys_resource_accept(
+    case 107: ret = static_cast<uint64_t>(sys_resource_accept(
         static_cast<mx_handle_t>(arg1),
         reinterpret_cast<mx_handle_t*>(arg2)));
         break;
-    case 107: ret = static_cast<uint64_t>(sys_hypervisor_create(
+    case 108: ret = static_cast<uint64_t>(sys_hypervisor_create(
         static_cast<mx_handle_t>(arg1),
         static_cast<uint32_t>(arg2),
         reinterpret_cast<mx_handle_t*>(arg3)));
         break;
-    case 108: ret = static_cast<uint64_t>(sys_hypervisor_op(
+    case 109: ret = static_cast<uint64_t>(sys_hypervisor_op(
         static_cast<mx_handle_t>(arg1),
         static_cast<uint32_t>(arg2),
         reinterpret_cast<const void*>(arg3),
@@ -597,34 +602,34 @@
         reinterpret_cast<void*>(arg5),
         static_cast<uint32_t>(arg6)));
         break;
-    case 109: ret = static_cast<uint64_t>(sys_syscall_test_0());
+    case 110: ret = static_cast<uint64_t>(sys_syscall_test_0());
         break;
-    case 110: ret = static_cast<uint64_t>(sys_syscall_test_1(
+    case 111: ret = static_cast<uint64_t>(sys_syscall_test_1(
         static_cast<int>(arg1)));
         break;
-    case 111: ret = static_cast<uint64_t>(sys_syscall_test_2(
+    case 112: ret = static_cast<uint64_t>(sys_syscall_test_2(
         static_cast<int>(arg1),
         static_cast<int>(arg2)));
         break;
-    case 112: ret = static_cast<uint64_t>(sys_syscall_test_3(
+    case 113: ret = static_cast<uint64_t>(sys_syscall_test_3(
         static_cast<int>(arg1),
         static_cast<int>(arg2),
         static_cast<int>(arg3)));
         break;
-    case 113: ret = static_cast<uint64_t>(sys_syscall_test_4(
+    case 114: ret = static_cast<uint64_t>(sys_syscall_test_4(
         static_cast<int>(arg1),
         static_cast<int>(arg2),
         static_cast<int>(arg3),
         static_cast<int>(arg4)));
         break;
-    case 114: ret = static_cast<uint64_t>(sys_syscall_test_5(
+    case 115: ret = static_cast<uint64_t>(sys_syscall_test_5(
         static_cast<int>(arg1),
         static_cast<int>(arg2),
         static_cast<int>(arg3),
         static_cast<int>(arg4),
         static_cast<int>(arg5)));
         break;
-    case 115: ret = static_cast<uint64_t>(sys_syscall_test_6(
+    case 116: ret = static_cast<uint64_t>(sys_syscall_test_6(
         static_cast<int>(arg1),
         static_cast<int>(arg2),
         static_cast<int>(arg3),
@@ -632,7 +637,7 @@
         static_cast<int>(arg5),
         static_cast<int>(arg6)));
         break;
-    case 116: ret = static_cast<uint64_t>(sys_syscall_test_7(
+    case 117: ret = static_cast<uint64_t>(sys_syscall_test_7(
         static_cast<int>(arg1),
         static_cast<int>(arg2),
         static_cast<int>(arg3),
@@ -641,7 +646,7 @@
         static_cast<int>(arg6),
         static_cast<int>(arg7)));
         break;
-    case 117: ret = static_cast<uint64_t>(sys_syscall_test_8(
+    case 118: ret = static_cast<uint64_t>(sys_syscall_test_8(
         static_cast<int>(arg1),
         static_cast<int>(arg2),
         static_cast<int>(arg3),

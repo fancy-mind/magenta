@@ -536,6 +536,11 @@ __attribute__((visibility("hidden"))) extern mx_status_t VDSO_mx_pci_map_mmio(
     mx_cache_policy_t cache_policy,
     mx_handle_t out_handle[1]) __attribute__((__leaf__));
 
+__attribute__((visibility("hidden"))) extern mx_status_t VDSO_mx_pci_get_bar(
+    mx_handle_t handle,
+    uint32_t bar_num,
+    mx_handle_t out_handle[1]) __attribute__((__leaf__));
+
 __attribute__((visibility("hidden"))) extern mx_status_t VDSO_mx_pci_io_write(
     mx_handle_t handle,
     uint32_t bar_num,

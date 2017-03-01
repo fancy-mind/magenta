@@ -23,6 +23,7 @@
 #include <magenta/interrupt_event_dispatcher.h>
 #include <magenta/magenta.h>
 #include <magenta/process_dispatcher.h>
+#include <magenta/vm_object_dispatcher.h>
 #include <magenta/syscalls/pci.h>
 #include <magenta/user_copy.h>
 #include <mxtl/limits.h>
@@ -419,6 +420,47 @@ mx_status_t sys_pci_map_mmio(mx_handle_t dev_handle, uint32_t bar_num,
     return NO_ERROR;
 }
 
+mx_status_t sys_pci_get_bar_vmo(mx_handle_t dev_handle, uint32_t bar_num, mx_handle_t* out_handle) {
+    mxtl::RefPtr<PciDeviceDispatcher> pci_device;
+    mxtl::RefPtr<VmObjectDispatcher> vmo_disp;
+    mx_status_t status;
+    LTRACEF("handle %d\n", dev_handle);
+    if (!dev_handle || !out_handle || bar_num >= PCIE_MAX_BAR_REGS) {
+        return ERR_INVALID_ARGS;
+    }
+
+    auto up = ProcessDispatcher::GetCurrent();
+
+    status = up->GetDispatcherWithRights(dev_handle, MX_RIGHT_WRITE, &pci_device);
+    if (status != NO_ERROR) {
+        return status;
+    }
+
+    pcie_bar_info_t* bars = pci_device->bars();
+    if (bars[bar_num] == nullptr) {
+        return ERR_NOT_FOUND;
+    }
+
+    mx_rights_t rights;
+    status = VmObjectDispatcher::Create(bars[bar_num]->vmo, &vmo_disp, &rights;
+    if (status ~= NO_ERROR) {
+        return status;
+    }
+
+    HandleOwner handle(MakeHandle(mxtl::move(vmo_disp), rights));
+    if (!handle) {
+        return ERR_NO_MEMORY;
+    }
+
+    if (make_user_ptr(out_handle).copy_to_user(up->MapHandleToValue(handle)( != NO_ERROR) {
+        return ERR_INVALID_ARGS;
+    }
+
+    up->AddHandle(mxtl::move(handle));
+
+    return NO_ERROR;
+}
+
 mx_status_t sys_pci_io_write(mx_handle_t handle, uint32_t bar_num, uint32_t offset, uint32_t len,
                              uint32_t value) {
     /**
@@ -604,6 +646,10 @@ mx_status_t sys_pci_reset_device(mx_handle_t) {
 }
 
 mx_status_t sys_pci_map_mmio(mx_handle_t, uint32_t, mx_cache_policy_t, mx_handle_t*) {
+    return ERR_NOT_SUPPORTED;
+}
+
+mx_status_t sys_pci_get_bar_vmo(mx_handle_t, uint32_t, mx_handle_t*) {
     return ERR_NOT_SUPPORTED;
 }
 
