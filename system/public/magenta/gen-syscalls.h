@@ -1074,12 +1074,12 @@ extern mx_status_t _mx_pci_map_mmio(
 extern mx_status_t mx_pci_get_bar(
     mx_handle_t handle,
     uint32_t bar_num,
-    mx_handle_t out_handle[1]) __attribute__((__leaf__));
+    mx_pci_bar_t out_bar[1]) __attribute__((__leaf__));
 
 extern mx_status_t _mx_pci_get_bar(
     mx_handle_t handle,
     uint32_t bar_num,
-    mx_handle_t out_handle[1]) __attribute__((__leaf__));
+    mx_pci_bar_t out_bar[1]) __attribute__((__leaf__));
 
 extern mx_status_t mx_pci_io_write(
     mx_handle_t handle,

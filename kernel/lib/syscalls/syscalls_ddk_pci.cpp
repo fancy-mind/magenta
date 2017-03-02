@@ -420,12 +420,15 @@ mx_status_t sys_pci_map_mmio(mx_handle_t dev_handle, uint32_t bar_num,
     return NO_ERROR;
 }
 
-mx_status_t sys_pci_get_bar(mx_handle_t dev_handle, uint32_t bar_num, mx_handle_t* out_handle) {
+mx_status_t sys_pci_get_bar(mx_handle_t dev_handle, uint32_t bar_num, mx_pci_bar_t* out_bar) {
     mxtl::RefPtr<PciDeviceDispatcher> pci_device;
     mxtl::RefPtr<Dispatcher> dispatcher;
+    HandleOwner mmio_handle;
+	mx_pci_bar_t bar;
     mx_status_t status;
+
     LTRACEF("handle %d\n", dev_handle);
-    if (!dev_handle || !out_handle || bar_num >= PCIE_MAX_BAR_REGS) {
+    if (!dev_handle || !out_bar || bar_num >= PCIE_MAX_BAR_REGS) {
         return ERR_INVALID_ARGS;
     }
 
@@ -441,19 +444,41 @@ mx_status_t sys_pci_get_bar(mx_handle_t dev_handle, uint32_t bar_num, mx_handle_
         return ERR_INVALID_ARGS;
     }
 
-    // We have a VMO, time to prep a handle to it for the caller
-    mx_rights_t rights;
-    status = VmObjectDispatcher::Create(info->vmo, &dispatcher, &rights);
-    if (status != NO_ERROR) return status;
+	// A bar can be MMIO, PIO, or unused. In the MMIO case it can be passed
+	// back to the caller as a VMO.
+	memset(&bar, 0, sizeof(bar));
+	if (info->size == 0) {
+		bar.type = PCI_BAR_TYPE_UNUSED;
+	} else if (info->is_mmio) {
+		DEBUG_ASSERT(info->vmo != nullptr);
+		bar.type = PCI_BAR_TYPE_MMIO;
+		bar.size = info->size;
 
-    HandleOwner handle(MakeHandle(mxtl::move(dispatcher), rights));
-    if (!handle) return ERR_NO_MEMORY;
+		// We have a VMO, time to prep a handle to it for the caller
+		mx_rights_t rights;
+		status = VmObjectDispatcher::Create(info->vmo, &dispatcher, &rights);
+		if (status != NO_ERROR) return status;
 
-    if (make_user_ptr(out_handle).copy_to_user(up->MapHandleToValue(handle)) != NO_ERROR) {
+		mmio_handle = HandleOwner(MakeHandle(mxtl::move(dispatcher), rights));
+		if (!mmio_handle) return ERR_NO_MEMORY;
+
+		bar.mmio_handle = up->MapHandleToValue(mmio_handle);
+	} else {
+		DEBUG_ASSERT(info->bus_addr != 0);
+		bar.type = PCI_BAR_TYPE_PIO;
+		bar.size = info->size;
+		bar.pio_addr = info->bus_addr;
+	}
+
+	/* Success so far, copy everything back to usersapce */
+    if (make_user_ptr(out_bar).copy_to_user(bar) != NO_ERROR) {
         return ERR_INVALID_ARGS;
     }
 
-    up->AddHandle(mxtl::move(handle));
+	/* If the bar is an mmio the VMO handle still needs to be accounted for */
+	if (info->is_mmio) {
+        up->AddHandle(mxtl::move(mmio_handle));
+	}
 
     return NO_ERROR;
 }
@@ -646,7 +671,7 @@ mx_status_t sys_pci_map_mmio(mx_handle_t, uint32_t, mx_cache_policy_t, mx_handle
     return ERR_NOT_SUPPORTED;
 }
 
-mx_status_t sys_pci_get_bar_vmo(mx_handle_t, uint32_t, mx_handle_t*) {
+mx_status_t sys_pci_get_bar(mx_handle_t, uint32_t, pci_bar_t**) {
     return ERR_NOT_SUPPORTED;
 }
 

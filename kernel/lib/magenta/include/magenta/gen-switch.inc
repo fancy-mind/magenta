@@ -509,7 +509,7 @@
     case 92: ret = static_cast<uint64_t>(sys_pci_get_bar(
         static_cast<mx_handle_t>(arg1),
         static_cast<uint32_t>(arg2),
-        reinterpret_cast<mx_handle_t*>(arg3)));
+        reinterpret_cast<mx_pci_bar_t*>(arg3)));
         break;
     case 93: ret = static_cast<uint64_t>(sys_pci_io_write(
         static_cast<mx_handle_t>(arg1),

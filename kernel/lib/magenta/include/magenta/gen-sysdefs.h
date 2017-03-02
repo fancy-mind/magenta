@@ -511,7 +511,7 @@ mx_status_t sys_pci_map_mmio(
 mx_status_t sys_pci_get_bar(
     mx_handle_t handle,
     uint32_t bar_num,
-    mx_handle_t out_handle[1]);
+    mx_pci_bar_t out_bar[1]);
 
 mx_status_t sys_pci_io_write(
     mx_handle_t handle,
