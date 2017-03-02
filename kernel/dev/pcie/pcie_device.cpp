@@ -16,6 +16,7 @@
 #include <kernel/mutex.h>
 #include <kernel/spinlock.h>
 #include <kernel/vm.h>
+#include <kernel/vm/vm_object.h>
 #include <list.h>
 #include <lk/init.h>
 #include <mxtl/limits.h>
@@ -410,6 +411,7 @@ status_t PcieDevice::ProbeBarsLocked() {
         if (probe_res != NO_ERROR)
             return probe_res;
 
+        /* Valid bars will have a size > 0 */
         if (bars_[i].size > 0) {
             /* If this was a 64 bit bar, it took two registers to store.  Make
              * sure to skip the next register */
@@ -422,7 +424,18 @@ status_t PcieDevice::ProbeBarsLocked() {
                     return ERR_BAD_STATE;
                 }
             }
+
+            // Create a VMO mapping for this bar to hand out to clients
+            // TODO(cja): PIO bars
+            if (bars_[i].is_mmio && bars_[i].size > 0) {
+                bars_[i].vmo = VmObjectPhysical::Create(bars_[i].bus_addr, bars_[i].size);
+                if (bars_[i].vmo != nullptr) {
+                    bars_[i].vmo->Dump(0, true);
+                }
+            }
+
         }
+
     }
 
     return NO_ERROR;

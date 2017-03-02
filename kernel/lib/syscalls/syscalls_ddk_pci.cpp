@@ -420,9 +420,9 @@ mx_status_t sys_pci_map_mmio(mx_handle_t dev_handle, uint32_t bar_num,
     return NO_ERROR;
 }
 
-mx_status_t sys_pci_get_bar_vmo(mx_handle_t dev_handle, uint32_t bar_num, mx_handle_t* out_handle) {
+mx_status_t sys_pci_get_bar(mx_handle_t dev_handle, uint32_t bar_num, mx_handle_t* out_handle) {
     mxtl::RefPtr<PciDeviceDispatcher> pci_device;
-    mxtl::RefPtr<VmObjectDispatcher> vmo_disp;
+    mxtl::RefPtr<Dispatcher> dispatcher;
     mx_status_t status;
     LTRACEF("handle %d\n", dev_handle);
     if (!dev_handle || !out_handle || bar_num >= PCIE_MAX_BAR_REGS) {
@@ -431,28 +431,25 @@ mx_status_t sys_pci_get_bar_vmo(mx_handle_t dev_handle, uint32_t bar_num, mx_han
 
     auto up = ProcessDispatcher::GetCurrent();
 
+    // Grab the PCI device object
     status = up->GetDispatcherWithRights(dev_handle, MX_RIGHT_WRITE, &pci_device);
-    if (status != NO_ERROR) {
-        return status;
+    if (status != NO_ERROR) return status;
+
+    // Get bar info from the device via the dispatcher and make sure it makes sense
+    const pcie_bar_info_t* info = pci_device->GetBar(bar_num);
+    if (!info || info->size == 0 || info->vmo == nullptr) {
+        return ERR_INVALID_ARGS;
     }
 
-    pcie_bar_info_t* bars = pci_device->bars();
-    if (bars[bar_num] == nullptr) {
-        return ERR_NOT_FOUND;
-    }
-
+    // We have a VMO, time to prep a handle to it for the caller
     mx_rights_t rights;
-    status = VmObjectDispatcher::Create(bars[bar_num]->vmo, &vmo_disp, &rights;
-    if (status ~= NO_ERROR) {
-        return status;
-    }
+    status = VmObjectDispatcher::Create(info->vmo, &dispatcher, &rights);
+    if (status != NO_ERROR) return status;
 
-    HandleOwner handle(MakeHandle(mxtl::move(vmo_disp), rights));
-    if (!handle) {
-        return ERR_NO_MEMORY;
-    }
+    HandleOwner handle(MakeHandle(mxtl::move(dispatcher), rights));
+    if (!handle) return ERR_NO_MEMORY;
 
-    if (make_user_ptr(out_handle).copy_to_user(up->MapHandleToValue(handle)( != NO_ERROR) {
+    if (make_user_ptr(out_handle).copy_to_user(up->MapHandleToValue(handle)) != NO_ERROR) {
         return ERR_INVALID_ARGS;
     }
 
