@@ -1,0 +1,15 @@
+// Top Level of MDI
+
+list            cpu-map                     1   // CPU information
+list            kernel-drivers              2   // kernel drivers go here
+list            drivers                     3   // userspace drivers go here
+
+// CPU topology
+list            cpu-map.clusters            100
+uint32          cpu-map.clusters.id         101
+string          cpu-map.clusters.name       102
+list            cpu-map.clusters.cpus       103
+uint32          cpu-map.clusters.cpus.id    104
+
+// Qualcomm msm UART
+list            kernel-drivers.msm-uart     1000
